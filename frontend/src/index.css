@@ -1,0 +1,309 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================================
+   Tokens
+   Light is the base definition; dark overrides the same names, so every
+   component reads one set of variables and never branches on theme.
+   ===================================================================== */
+@layer base {
+  :root {
+    --ink: 15 23 42;
+    --ink-muted: 71 85 105;
+    --ink-faint: 148 163 184;
+
+    --surface: 255 255 255;
+    --surface-raised: 255 255 255;
+    --surface-sunken: 241 245 249;
+
+    --page: 248 250 252;
+    --hairline: 15 23 42;
+    --hairline-alpha: 0.08;
+
+    --grid-line: 15 23 42;
+    --grid-alpha: 0.035;
+
+    --accent-rgb: 99 102 241;
+  }
+
+  .dark {
+    --ink: 226 232 240;
+    --ink-muted: 148 163 184;
+    --ink-faint: 100 116 139;
+
+    /* Deep slate, deliberately not pure black. */
+    --surface: 17 20 27;
+    --surface-raised: 23 27 36;
+    --surface-sunken: 13 16 22;
+
+    --page: 10 12 17;
+    --hairline: 226 232 240;
+    --hairline-alpha: 0.09;
+
+    --grid-line: 226 232 240;
+    --grid-alpha: 0.028;
+  }
+
+  * {
+    border-color: rgb(var(--hairline) / var(--hairline-alpha));
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    color: rgb(var(--ink));
+    background-color: rgb(var(--page));
+    min-height: 100vh;
+  }
+
+  /* Faint grid + a soft accent wash. Fixed so it does not scroll with content. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background-image:
+      linear-gradient(to right, rgb(var(--grid-line) / var(--grid-alpha)) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(var(--grid-line) / var(--grid-alpha)) 1px, transparent 1px);
+    background-size: 64px 64px;
+    mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 100% 70% at 50% 0%, #000 40%, transparent 100%);
+    pointer-events: none;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(700px 380px at 12% -8%, rgb(var(--accent-rgb) / 0.13), transparent 65%),
+      radial-gradient(560px 320px at 88% 4%, rgb(34 211 238 / 0.08), transparent 65%);
+    pointer-events: none;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight;
+  }
+
+  /* One visible, consistent focus treatment across the whole app. */
+  :focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+
+  ::selection {
+    background: rgb(99 102 241 / 0.28);
+  }
+
+  /* Marks inputs: no spinners, digits aligned. */
+  input[type='number']::-webkit-outer-spin-button,
+  input[type='number']::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type='number'] {
+    -moz-appearance: textfield;
+  }
+}
+
+@layer components {
+  /* Every digit column in the app uses this so figures line up vertically. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+
+  .card {
+    @apply rounded-2xl border bg-surface-raised;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 14px 34px -18px rgb(0 0 0 / 0.35);
+  }
+
+  .card-flat {
+    @apply rounded-2xl border bg-surface-raised;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+           transition-all duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply btn text-white;
+    background-image: linear-gradient(180deg, #6366f1, #4f46e5);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.12) inset, 0 10px 24px -12px rgb(99 102 241 / 0.85);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-image: linear-gradient(180deg, #7376f4, #5b52e8);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.14) inset, 0 14px 30px -12px rgb(99 102 241 / 0.95);
+  }
+
+  .btn-ghost {
+    @apply btn border bg-transparent text-ink hover:bg-surface-sunken;
+  }
+
+  .btn-quiet {
+    @apply btn text-ink-muted hover:bg-surface-sunken hover:text-ink;
+  }
+
+  .field {
+    @apply w-full rounded-xl border bg-surface-sunken px-3.5 py-2.5 text-sm text-ink
+           placeholder:text-ink-faint transition-colors duration-150;
+  }
+
+  .field:hover {
+    border-color: rgb(var(--hairline) / 0.18);
+  }
+
+  .field:focus {
+    @apply outline-none;
+    border-color: rgb(99 102 241 / 0.65);
+    box-shadow: 0 0 0 3px rgb(99 102 241 / 0.16);
+  }
+
+  .field-invalid {
+    border-color: rgb(244 63 94 / 0.7) !important;
+    box-shadow: 0 0 0 3px rgb(244 63 94 / 0.14) !important;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+
+  .label {
+    @apply block text-xs font-semibold uppercase tracking-wider text-ink-faint;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-surface-sunken;
+  }
+
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full animate-shimmer;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--hairline) / 0.07),
+      transparent
+    );
+  }
+
+  /* Thin, unobtrusive scrollbars that respect the theme. */
+  .scroll-slim::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+
+  .scroll-slim::-webkit-scrollbar-thumb {
+    background: rgb(var(--hairline) / 0.16);
+    border-radius: 999px;
+  }
+}
+
+/* =====================================================================
+   Print - A4 marksheet
+   Nav, controls and every dark surface are dropped; the sheet prints as
+   black on white with hairline rules.
+   ===================================================================== */
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 14mm 14mm 16mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  body::before,
+  body::after {
+    display: none !important;
+  }
+
+  .no-print,
+  nav,
+  aside,
+  header.app-header,
+  .toast-viewport {
+    display: none !important;
+  }
+
+  main,
+  .print-root {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  .print-sheet {
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+    break-inside: avoid;
+  }
+
+  .print-sheet * {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  .print-sheet table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .print-sheet th,
+  .print-sheet td {
+    border: 1px solid #000 !important;
+    padding: 6px 8px !important;
+  }
+
+  .print-sheet thead th {
+    background: #f0f0f0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-avoid-break {
+    break-inside: avoid;
+  }
+}
+
+.print-only {
+  display: none;
+}
+
+/* Respect the OS reduced-motion setting for every animation in the app. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
